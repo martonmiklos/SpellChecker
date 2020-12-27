@@ -59,23 +59,26 @@ SpellChecker::~SpellChecker()
 
 bool SpellChecker::spell(const QString &word)
 {
-    // Encode from Unicode to the encoding used by current dictionary
-    return _hunspell->spell(_codec->fromUnicode(word).constData()) != 0;
+    return _hunspell->spell(_codec->fromUnicode(word).toStdString());
 }
 
 
 QStringList SpellChecker::suggest(const QString &word)
 {
-    char **suggestWordList;
-    
-    // Encode from Unicode to the encoding used by current dictionary
-    const char *wordChar = _codec->fromUnicode(word).constData();
-    int numSuggestions = _hunspell->suggest(&suggestWordList, _codec->fromUnicode(word).constData());
+    int numSuggestions = 0;
     QStringList suggestions;
-    for(int i=0; i < numSuggestions; ++i) {
-        suggestions << _codec->toUnicode(suggestWordList[i]);
-        free(suggestWordList[i]);
+    std::vector<std::string> wordlist;
+    wordlist = _hunspell->suggest(_codec->fromUnicode(word).toStdString());
+
+    numSuggestions = static_cast<int>(wordlist.size());
+    if (numSuggestions > 0) {
+        suggestions.reserve(numSuggestions);
+        for (int i = 0; i < numSuggestions; i++) {
+            suggestions << _codec->toUnicode(
+                             QByteArray::fromStdString(wordlist[i]));
+        }
     }
+
     return suggestions;
 }
 
