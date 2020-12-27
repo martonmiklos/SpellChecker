@@ -1,4 +1,4 @@
- #include "dialog.h"
+#include "dialog.h"
 #include "ui_dialog.h"
 #include "spellchecker.h"
 #include "spellcheckdialog.h"
@@ -87,6 +87,9 @@ void Dialog::checkSpelling()
                 case SpellCheckDialog::ReplaceOnce:
                     cursor.insertText(checkDialog->replacement());
                     break;
+                case SpellCheckDialog::ReplaceAll:
+                    this->replaceAll(cursor.position(), word, checkDialog->replacement());
+                    break;
 
                 default:
                     break;
@@ -102,4 +105,31 @@ void Dialog::checkSpelling()
                 this,
                 tr("Finished"),
                 tr("The spell check has finished."));
+}
+
+
+void Dialog::replaceAll(int nPos, QString sOld, QString sNew) {
+    QTextCursor cursor(ui->textEdit->document());
+    cursor.setPosition(nPos-sOld.length(), QTextCursor::MoveAnchor);
+
+    while(!cursor.atEnd()) {
+        QCoreApplication::processEvents();
+        cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor, 1);
+        QString word = cursor.selectedText();
+
+        // Workaround for better recognition of words
+        // punctuation etc. does not belong to words
+        while(!word.isEmpty() && !word.at(0).isLetter() && cursor.anchor() < cursor.position()) {
+            int cursorPos = cursor.position();
+            cursor.setPosition(cursor.anchor() + 1, QTextCursor::MoveAnchor);
+            cursor.setPosition(cursorPos, QTextCursor::KeepAnchor);
+            word = cursor.selectedText();
+        }
+
+        if(word == sOld) {
+            cursor.insertText(sNew);
+            QCoreApplication::processEvents();
+        }
+        cursor.movePosition(QTextCursor::NextWord, QTextCursor::MoveAnchor, 1);
+    }
 }
