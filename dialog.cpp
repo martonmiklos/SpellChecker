@@ -3,6 +3,7 @@
 #include "spellchecker.h"
 #include "spellcheckdialog.h"
 
+#include <QDir>
 #include <QMessageBox>
 
 Dialog::Dialog(QWidget *parent) :
@@ -22,8 +23,34 @@ Dialog::~Dialog()
 
 void Dialog::checkSpelling()
 {
-    QString dictPath = "/usr/share/hunspell/hu_HU";
-    QString userDict= "/usr/share/hunspell/hu_HU.aff";
+    QString language = "en_US";
+
+    QString dictPath = "/usr/share/hunspell";
+    if (!QDir(dictPath).exists()) {
+      // Standard path for Hunspell
+      if (QDir(QStringLiteral("/usr/share/hunspell")).exists()) {
+        dictPath = QStringLiteral("/usr/share/hunspell/");
+      } else if (QDir(QStringLiteral("/usr/local/share/hunspell")).exists()) {
+        dictPath = QStringLiteral("/usr/local/share/hunspell/");
+        // Otherwise look for MySpell dictionary
+      } else if (QDir(QStringLiteral("/usr/share/myspell/dicts")).exists()) {
+        dictPath = QStringLiteral("/usr/share/myspell/dicts/");
+      } else if (QDir(
+                   QStringLiteral("/usr/local/share/myspell/dicts")).exists()) {
+        dictPath = QStringLiteral("/usr/local/share/myspell/dicts/");
+      } else {
+        // Fallback and for Windows: Use app dir
+        dictPath = qApp->applicationDirPath() + "/dicts/";
+      }
+    }
+    if (!dictPath.endsWith('/')) {
+      dictPath.append('/');
+    }
+    dictPath += language;
+
+    // Save user dictionary in same folder as application
+    QString userDict= "userDict_" + language + ".txt";
+
     SpellChecker *spellChecker = new SpellChecker(dictPath, userDict);
     SpellCheckDialog *checkDialog = new SpellCheckDialog(spellChecker, this);
 
