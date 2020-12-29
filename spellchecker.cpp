@@ -1,10 +1,11 @@
 #include "./spellchecker.h"
 
-#include <QFile>
-#include <QTextStream>
-#include <QTextCodec>
-#include <QStringList>
 #include <QDebug>
+#include <QFile>
+#include <QRegularExpression>
+#include <QStringList>
+#include <QTextCodec>
+#include <QTextStream>
 
 #include <string>
 #include <vector>
@@ -25,13 +26,17 @@ SpellChecker::SpellChecker(const QString &dictionaryPath,
   QFile _affixFile(affixFile);
   if (_affixFile.open(QIODevice::ReadOnly)) {
     QTextStream stream(&_affixFile);
-    QRegExp enc_detector(QStringLiteral("^\\s*SET\\s+([A-Z0-9\\-]+)\\s*"),
-                         Qt::CaseInsensitive);
-    for (QString line = stream.readLine();
-         !line.isEmpty();
-         line = stream.readLine()) {
-      if (enc_detector.indexIn(line) > -1) {
-        _encoding = enc_detector.cap(1);
+    QRegularExpression enc_detector(
+          QStringLiteral("^\\s*SET\\s+([A-Z0-9\\-]+)\\s*"),
+          QRegularExpression::CaseInsensitiveOption);
+    QString sLine;
+    QRegularExpressionMatch match;
+    while (!stream.atEnd()) {
+      sLine = stream.readLine();
+      if (sLine.isEmpty()) { continue; }
+      match = enc_detector.match(sLine);
+      if (match.hasMatch()) {
+        _encoding = match.captured(1);
         qDebug() << "Encoding set to " + _encoding;
         break;
       }
