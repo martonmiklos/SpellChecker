@@ -11,8 +11,8 @@ Dialog::Dialog(QWidget *parent)
   : QDialog(parent),
     ui(new Ui::Dialog) {
   ui->setupUi(this);
-  connect(ui->buttonCheckSpelling, SIGNAL(clicked()),
-          this, SLOT(checkSpelling()));
+  connect(ui->buttonCheckSpelling, &QPushButton::clicked,
+          this, &Dialog::checkSpelling);
 }
 
 

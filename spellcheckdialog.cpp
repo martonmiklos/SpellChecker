@@ -9,15 +9,21 @@ SpellCheckDialog::SpellCheckDialog(SpellChecker *spellChecker, QWidget *parent)
   ui->setupUi(this);
   _spellChecker = spellChecker;
 
-  connect(ui->listWidget, SIGNAL(currentTextChanged(QString)),
-          ui->ledtReplaceWith, SLOT(setText(QString)));
+  connect(ui->listWidget, &QListWidget::currentTextChanged,
+          ui->ledtReplaceWith, &QLineEdit::setText);
 
-  connect(ui->btnAddToDict, SIGNAL(clicked()), this, SLOT(addToDict()));
-  connect(ui->btnReplaceOnce, SIGNAL(clicked()), this, SLOT(replaceOnce()));
-  connect(ui->btnReplaceAll, SIGNAL(clicked()), this, SLOT(replaceAll()));
-  connect(ui->btnIgnoreOnce, SIGNAL(clicked()), this, SLOT(ignoreOnce()));
-  connect(ui->btnIgnoreAll, SIGNAL(clicked()), this, SLOT(ignoreAll()));
-  connect(ui->btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(ui->btnAddToDict, &QPushButton::clicked,
+          this, &SpellCheckDialog::addToDict);
+  connect(ui->btnReplaceOnce, &QPushButton::clicked,
+          this, &SpellCheckDialog::replaceOnce);
+  connect(ui->btnReplaceAll, &QPushButton::clicked,
+          this, &SpellCheckDialog::replaceAll);
+  connect(ui->btnIgnoreOnce, &QPushButton::clicked,
+          this, &SpellCheckDialog::ignoreOnce);
+  connect(ui->btnIgnoreAll, &QPushButton::clicked,
+          this, &SpellCheckDialog::ignoreAll);
+  connect(ui->btnCancel, &QPushButton::clicked,
+          this, &SpellCheckDialog::reject);
 }
 
 

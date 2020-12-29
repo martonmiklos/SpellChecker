@@ -2,8 +2,10 @@
 #define SPELLCHECKER_H
 
 #include <QString>
+#include <QStringList>
 
 class Hunspell;
+class QTextCodec;
 
 class SpellChecker {
  public:
