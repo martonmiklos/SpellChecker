@@ -13,7 +13,8 @@ class SpellCheckDialog : public QDialog {
   Q_OBJECT
 
  public:
-  enum SpellCheckAction {AbortCheck, IgnoreOnce, IgnoreAll, ReplaceOnce, ReplaceAll, AddToDict};
+  enum SpellCheckAction {AbortCheck, IgnoreOnce, IgnoreAll,
+                         ReplaceOnce, ReplaceAll, AddToDict};
 
   explicit SpellCheckDialog(SpellChecker *spellChecker, QWidget *parent = 0);
   ~SpellCheckDialog();
@@ -21,7 +22,7 @@ class SpellCheckDialog : public QDialog {
   QString replacement() const;
 
  public slots:
-  SpellCheckAction checkWord(const QString &word);
+  SpellCheckDialog::SpellCheckAction checkWord(const QString &word);
 
  protected slots:
   void ignoreOnce();

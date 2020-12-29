@@ -18,7 +18,7 @@ protected slots:
   void checkSpelling();
 
 private:
-  void replaceAll(int nPos, QString sOld, QString sNew);
+  void replaceAll(int nPos, const QString &sOld, const QString &sNew);
   Ui::Dialog *ui;
 };
 

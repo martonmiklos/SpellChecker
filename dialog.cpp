@@ -22,9 +22,9 @@ Dialog::~Dialog() {
 
 
 void Dialog::checkSpelling() {
-  QString language = "en_US";
+  QString language = QStringLiteral("en_US");
 
-  QString dictPath = "/usr/share/hunspell";
+  QString dictPath = QStringLiteral("/usr/share/hunspell");
   if (!QDir(dictPath).exists()) {
     // Standard path for Hunspell
     if (QDir(QStringLiteral("/usr/share/hunspell")).exists()) {
@@ -54,8 +54,8 @@ void Dialog::checkSpelling() {
   SpellCheckDialog *checkDialog = new SpellCheckDialog(spellChecker, this);
 
   QTextCharFormat highlightFormat;
-  highlightFormat.setBackground(QBrush(QColor("#ff6060")));
-  highlightFormat.setForeground(QBrush(QColor("#000000")));
+  highlightFormat.setBackground(QBrush(QColor(0xff, 0x60, 0x60)));
+  highlightFormat.setForeground(QBrush(QColor(0, 0, 0)));
   // alternative format
   // highlightFormat.setUnderlineColor(QColor("red"));
   // highlightFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
@@ -65,6 +65,8 @@ void Dialog::checkSpelling() {
 
   // create a new cursor to walk through the text
   QTextCursor cursor(ui->textEdit->document());
+
+  QList<QTextEdit::ExtraSelection> esList;
 
   // Don't call cursor.beginEditBlock(), as this prevents the rewdraw after
   // changes to the content cursor.beginEditBlock();
@@ -95,7 +97,6 @@ void Dialog::checkSpelling() {
       es.cursor = cursor;
       es.format = highlightFormat;
 
-      QList<QTextEdit::ExtraSelection> esList;
       esList << es;
       ui->textEdit->setExtraSelections(esList);
       QCoreApplication::processEvents();
@@ -127,6 +128,9 @@ void Dialog::checkSpelling() {
     cursor.movePosition(QTextCursor::NextWord, QTextCursor::MoveAnchor, 1);
   }
   // cursor.endEditBlock();
+
+  delete checkDialog;
+  checkDialog = nullptr;
   ui->textEdit->setTextCursor(oldCursor);
 
   QMessageBox::information(
@@ -136,7 +140,7 @@ void Dialog::checkSpelling() {
 }
 
 
-void Dialog::replaceAll(int nPos, QString sOld, QString sNew) {
+void Dialog::replaceAll(int nPos, const QString &sOld, const QString &sNew) {
   QTextCursor cursor(ui->textEdit->document());
   cursor.setPosition(nPos-sOld.length(), QTextCursor::MoveAnchor);
 

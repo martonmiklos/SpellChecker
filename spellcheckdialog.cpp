@@ -28,7 +28,7 @@ SpellCheckDialog::~SpellCheckDialog() {
 
 SpellCheckDialog::SpellCheckAction SpellCheckDialog::checkWord(const QString &word) {
   _unkownWord = word;
-  ui->lblUnknownWord->setText(QString("<b>%1</b>").arg(_unkownWord));
+  ui->lblUnknownWord->setText(QStringLiteral("<b>%1</b>").arg(_unkownWord));
 
   ui->ledtReplaceWith->clear();
 

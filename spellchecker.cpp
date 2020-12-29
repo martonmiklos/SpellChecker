@@ -21,17 +21,18 @@ SpellChecker::SpellChecker(const QString &dictionaryPath,
                            dictFilePathBA.constData());
 
   // detect encoding analyzing the SET option in the affix file
-  _encoding = "ISO8859-15";
+  _encoding = QStringLiteral("ISO8859-15");
   QFile _affixFile(affixFile);
   if (_affixFile.open(QIODevice::ReadOnly)) {
     QTextStream stream(&_affixFile);
-    QRegExp enc_detector("^\\s*SET\\s+([A-Z0-9\\-]+)\\s*", Qt::CaseInsensitive);
+    QRegExp enc_detector(QStringLiteral("^\\s*SET\\s+([A-Z0-9\\-]+)\\s*"),
+                         Qt::CaseInsensitive);
     for (QString line = stream.readLine();
          !line.isEmpty();
          line = stream.readLine()) {
       if (enc_detector.indexIn(line) > -1) {
         _encoding = enc_detector.cap(1);
-        qDebug() << QString("Encoding set to ") + _encoding;
+        qDebug() << "Encoding set to " + _encoding;
         break;
       }
     }
