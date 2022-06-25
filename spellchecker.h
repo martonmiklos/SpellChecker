@@ -4,8 +4,13 @@
 #include <QString>
 #include <QStringList>
 
-class Hunspell;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 class QTextCodec;
+#else
+#include <QStringDecoder>
+#include <QStringEncoder>
+#endif
+class Hunspell;
 
 class SpellChecker {
  public:
@@ -22,7 +27,12 @@ class SpellChecker {
   Hunspell *_hunspell;
   QString _userDictionary;
   QString _encoding;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QTextCodec *_codec;
+#else
+  QStringDecoder _decoder;
+  QStringEncoder _encoder;
+#endif
 };
 
 #endif // SPELLCHECKER_H 
