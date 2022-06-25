@@ -68,7 +68,7 @@ void Dialog::checkSpelling() {
 
   QList<QTextEdit::ExtraSelection> esList;
 
-  // Don't call cursor.beginEditBlock(), as this prevents the rewdraw after
+  // Don't call cursor.beginEditBlock(), as this prevents the redraw after
   // changes to the content cursor.beginEditBlock();
   while (!cursor.atEnd()) {
     QCoreApplication::processEvents();

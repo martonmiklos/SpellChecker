@@ -4,8 +4,10 @@
 #include <QFile>
 #include <QRegularExpression>
 #include <QStringList>
-#include <QTextCodec>
 #include <QTextStream>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QTextCodec>
+#endif
 
 #include <string>
 #include <vector>
@@ -43,10 +45,20 @@ SpellChecker::SpellChecker(const QString &dictionaryPath,
     }
     _affixFile.close();
   }
-  _codec = QTextCodec::codecForName(this->_encoding.toLatin1().constData());
 
-  if (!_userDictionary.isEmpty()) {
-    QFile userDictonaryFile(_userDictionary);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  _codec = QTextCodec::codecForName(this->_encoding.toLatin1().constData());
+#else
+  _decoder = QStringDecoder(this->_encoding.toLatin1().constData());
+  _encoder = QStringEncoder(this->_encoding.toLatin1().constData());
+  if (!_decoder.isValid() || !_encoder.isValid()) {
+    qWarning() << "Invalid string converter! Decoder:" << _decoder.name()
+               << "- Encoder: " << _encoder.name();
+  }
+#endif
+
+  QFile userDictonaryFile(_userDictionary);
+  if (!_userDictionary.isEmpty() && userDictonaryFile.exists()) {
     if (userDictonaryFile.open(QIODevice::ReadOnly)) {
       QTextStream stream(&userDictonaryFile);
       for (QString word = stream.readLine();
@@ -70,7 +82,11 @@ SpellChecker::~SpellChecker() {
 
 
 bool SpellChecker::spell(const QString &word) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   return _hunspell->spell(_codec->fromUnicode(word).toStdString());
+#else
+  return _hunspell->spell(QByteArray(_encoder(word)).toStdString());
+#endif
 }
 
 
@@ -78,14 +94,22 @@ QStringList SpellChecker::suggest(const QString &word) {
   int numSuggestions = 0;
   QStringList suggestions;
   std::vector<std::string> wordlist;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   wordlist = _hunspell->suggest(_codec->fromUnicode(word).toStdString());
+#else
+  wordlist = _hunspell->suggest(QByteArray(_encoder(word)).toStdString());
+#endif
 
   numSuggestions = static_cast<int>(wordlist.size());
   if (numSuggestions > 0) {
     suggestions.reserve(numSuggestions);
     for (int i = 0; i < numSuggestions; i++) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
       suggestions << _codec->toUnicode(
                        QByteArray::fromStdString(wordlist[i]));
+#else
+      suggestions << _decoder(wordlist[i]);
+#endif
     }
   }
 
@@ -99,7 +123,11 @@ void SpellChecker::ignoreWord(const QString &word) {
 
 
 void SpellChecker::put_word(const QString &word) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   _hunspell->add(_codec->fromUnicode(word).constData());
+#else
+  _hunspell->add(QByteArray(_encoder(word)).constData());
+#endif
 }
 
 
